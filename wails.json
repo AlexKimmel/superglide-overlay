@@ -1,0 +1,13 @@
+{
+  "$schema": "https://wails.io/schemas/config.v2.json",
+  "name": "superglide-overlay",
+  "outputfilename": "superglide-overlay",
+  "frontend:install": "npm install",
+  "frontend:build": "npm run build",
+  "frontend:dev:watcher": "",
+  "frontend:dev:serverUrl": "",
+  "author": {
+    "name": "AlexKimmel",
+    "email": "alex.kim1603@gmail.com"
+  }
+}
