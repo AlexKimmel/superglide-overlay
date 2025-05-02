@@ -4,26 +4,27 @@ import './app.css';
 import { EventsOn } from "../wailsjs/runtime/runtime";
 
 // Replace the app container with layout for results
+
 document.querySelector('#app').innerHTML = `
   <div class="container">
-    <div class="average" id="averageDisplay">Average: 0%</div>
+    <div class="timeline" id="timeline"></div>
     <div class="result" id="result">Waiting for input...</div>
   </div>
 `;
 
 // Reference the result and average containers AFTER they exist
 const resultElement = document.getElementById("result");
-const averageElement = document.getElementById("averageDisplay");
+// const averageElement = document.getElementById("averageDisplay");
+const timeline = document.getElementById("timeline");
 
-let total = 0;
-let count = 0;
+for (let i = 0; i < 10; i++) {
+  const dot = document.createElement("div");
+  dot.classList.add("timeline-dot");
+  dot.style.backgroundColor = "#444"; // neutral gray
+  timeline.appendChild(dot);
+}
 
 EventsOn("superglideResult", (data) => {
-  // Calculate running average
-  total += data.chancePercent;
-  count++;
-  const average = total / count;
-
   // Update result display
   resultElement.innerHTML = `
     Attempt #${data.attempt}<br>
@@ -32,22 +33,31 @@ EventsOn("superglideResult", (data) => {
     ${data.message}
   `;
 
+  // Color Updates
+  const color = getColorFromChance(data.chancePercent);
+  resultElement.style.color = color;
+  averageElement.style.color = color;
+
+  // Time line 
+  const dot = document.createElement("div");
+  dot.classList.add("timeline-dot");
+  dot.style.backgroundColor = color;
+
+  timeline.appendChild(dot);
+
+  if (timeline.children.length > 10) {
+    timeline.removeChild(timeline.firstChild);
+  }  
+
   // Update average display
-  averageElement.innerHTML = `Average: ${data.averageChance.toFixed(1)}%`;
-
-  // Color the result chance
-  resultElement.style.color =
-    data.chancePercent >= 90
-      ? "#00ff00"
-      : data.chancePercent > 50
-      ? "#ffff00"
-      : "#ff4444";
-
-  // Color the average separately
-  averageElement.style.color =
-    average >= 90
-      ? "#00ff00"
-      : average > 50
-      ? "#ffff00"
-      : "#ff4444";
+  // averageElement.innerHTML = `Average: ${data.averageChance.toFixed(1)}%`;
 });
+
+
+function getColorFromChance(chance) {
+  if (chance >= 95) return "#00ff00";
+  if(chance >= 70) return "#44ffa4"
+  if (chance >= 50) return "#44ffa4";
+  if(chance >= 30) return "fff000"
+  return "#ff4444";
+}
