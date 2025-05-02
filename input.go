@@ -20,7 +20,7 @@ type InputHandler struct {
 func NewInputHandler(ctx context.Context) *InputHandler {
 	return &InputHandler{
 		ctx:   ctx,
-		glide: NewSuperglideChecker(185),
+		glide: NewSuperglideChecker(185, 0x20, 0x43),
 	}
 }
 
@@ -58,11 +58,11 @@ func (h *InputHandler) run() {
 				continue //  only handel key down
 			}
 
-			switch k.VKCode {
-			case 0x20: // Space
+			switch uint32(k.VKCode) {
+			case uint32(h.glide.KeyBinds.Jump):
 				h.glide.RegisterJump()
 
-			case 0x43: // C
+			case uint32(h.glide.KeyBinds.Crouch):
 				if result, ok := h.glide.RegisterCrouch(); ok {
 					//runtime.LogPrint(h.ctx, "Registerd Crouch input")
 					runtime.EventsEmit(h.ctx, "superglideResult", result)

@@ -14,8 +14,14 @@ const (
 	Crouch
 )
 
+type KeyBinds struct {
+	Jump   uint32
+	Crouch uint32
+}
+
 type SuperglideChecker struct {
 	TargetFPS   float64
+	KeyBinds    KeyBinds
 	FrameTime   float64
 	LastState   GlideState
 	State       GlideState
@@ -26,13 +32,15 @@ type SuperglideChecker struct {
 	LastMessage string
 }
 
-func NewSuperglideChecker(fps float64) *SuperglideChecker {
+func NewSuperglideChecker(fps float64, jump uint32, crouch uint32) *SuperglideChecker {
 	return &SuperglideChecker{
+		KeyBinds:  KeyBinds{Jump: jump, Crouch: crouch},
 		TargetFPS: fps,
 		FrameTime: 1.0 / fps,
 		State:     Ready,
 	}
 }
+
 func (s *SuperglideChecker) RegisterJump() (map[string]any, bool) {
 	if s == nil {
 		return nil, false

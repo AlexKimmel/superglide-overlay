@@ -2,9 +2,8 @@ package main
 
 import (
 	"context"
-	"syscall"
 
-	"github.com/lxn/win"
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 // App struct
@@ -23,9 +22,20 @@ func NewApp() *App {
 // startup is called when the app starts. The context is saved
 // so we can call the runtime methods
 func (a *App) startup(ctx context.Context) {
-	hwnd := win.FindWindow(nil, syscall.StringToUTF16Ptr("Superglide Overlay"))
-	win.SetWindowLong(hwnd, win.GWL_EXSTYLE, win.GetWindowLong(hwnd, win.GWL_EXSTYLE)|win.WS_EX_LAYERED)
+	// hwnd := win.FindWindow(nil, syscall.StringToUTF16Ptr("Superglide Overlay"))
+	// win.SetWindowLong(hwnd, win.GWL_EXSTYLE, win.GetWindowLong(hwnd, win.GWL_EXSTYLE)|win.WS_EX_LAYERED)
 
 	a.ctx = ctx
 	a.inputHandler.StartListening(ctx)
+}
+
+func (a *App) UpdateSettings(fps float64, jump uint32, crouch uint32) {
+
+	runtime.LogPrintf(a.ctx, "%ffps", fps)
+
+	a.inputHandler.glide.KeyBinds = KeyBinds{Jump: jump, Crouch: crouch}
+
+	a.inputHandler.glide.TargetFPS = fps
+	a.inputHandler.glide.FrameTime = 1.0 / fps
+	a.inputHandler.glide.State = Ready
 }
