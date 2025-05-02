@@ -19,12 +19,12 @@ func main() {
 	// Create application with options
 	err := wails.Run(&options.App{
 		Title:  "superglide-overlay",
-		Width:  350,
-		Height: 200,
+		Width:  300,
+		Height: 175,
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},
-		BackgroundColour: &options.RGBA{R: 255, G: 255, B: 255, A: 150},
+		BackgroundColour: &options.RGBA{R: 0, G: 0, B: 0, A: 175},
 		OnStartup:        app.startup,
 		Bind: []interface{}{
 			app,

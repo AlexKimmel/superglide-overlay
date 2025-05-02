@@ -33,7 +33,7 @@ EventsOn("superglideResult", (data) => {
   `;
 
   // Update average display
-  averageElement.innerHTML = `Average: ${average.toFixed(1)}%`;
+  averageElement.innerHTML = `Average: ${data.averageChance.toFixed(1)}%`;
 
   // Color the result chance
   resultElement.style.color =

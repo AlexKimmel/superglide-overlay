@@ -60,10 +60,7 @@ func (h *InputHandler) run() {
 
 			switch k.VKCode {
 			case 0x20: // Space
-				if result, ok := h.glide.RegisterJump(); ok {
-					//runtime.LogPrint(h.ctx, "Registerd Jump input")
-					runtime.EventsEmit(h.ctx, "superglideResult", result)
-				}
+				h.glide.RegisterJump()
 
 			case 0x43: // C
 				if result, ok := h.glide.RegisterCrouch(); ok {
