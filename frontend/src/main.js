@@ -3,7 +3,36 @@ import './app.css';
 
 import { EventsOn } from "../wailsjs/runtime/runtime";
 import { UpdateSettings } from '../wailsjs/go/main/App';
+import { GetSettings } from '../wailsjs/go/main/App';
 import { LogPrint } from '../wailsjs/runtime/runtime';
+
+const vkMap = {
+  8: "Backspace",
+  9: "Tab",
+  13: "Enter",
+  16: "Shift",
+  17: "Ctrl",
+  18: "Alt",
+  19: "Pause",
+  20: "CapsLock",
+  27: "Escape",
+  32: "Space",
+  33: "PageUp",
+  34: "PageDown",
+  35: "End",
+  36: "Home",
+  37: "Left",
+  38: "Up",
+  39: "Right",
+  40: "Down",
+  45: "Insert",
+  46: "Delete",
+  // 48–90 = 0-9, A-Z
+};
+
+for (let i = 48; i <= 90; i++) {
+  vkMap[i] = String.fromCharCode(i); // 0-9, A-Z
+}  
 
 document.querySelector('#app').innerHTML = `
   <div class="topnav">
@@ -32,7 +61,7 @@ document.querySelector('#app').innerHTML = `
     </div>
     <div class="row">      
       <p>FPS:</p>
-      <input id="fpsInput" class="input" type="number" min="1" value="120" />
+      <input id="fpsInput" class="input" type="number" min="1" />
     </div>
   </div>
 `;
@@ -85,12 +114,16 @@ EventsOn("superglideResult", (data) => {
 function updateActive(tab) {
   document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active"));
   tab.classList.add("active");
-
+  
   document.getElementById("page-home").classList.add("hidden");
   document.getElementById("page-settings").classList.add("hidden");
-
+  
   const target = tab.getAttribute("href").replace("#", "page-");
   document.getElementById(target).classList.remove("hidden");
+  const targetId = target;
+  if (targetId === "page-settings") {
+    setTimeout(getSettings, 50);
+  }
 }
 
 function getColorFromChance(chance) {
@@ -101,9 +134,8 @@ function getColorFromChance(chance) {
   return "#ff4444";
 }
 
-
-let jumpVKCode = 32; // Default: SPACE
-let crouchVKCode = 0x40 // Default: C
+let jumpVKCode = null;
+let crouchVKCode = null;
 
 document.getElementById("jumpButton").addEventListener("click", () => {
   const button = document.getElementById("jumpButton");
@@ -123,9 +155,10 @@ document.getElementById("jumpButton").addEventListener("click", () => {
     }
     jumpVKCode = vkCode >>> 0; // Ensure it's stored as uint32
 
+    updateSettings(jumpVKCode, crouchVKCode);
+
     document.removeEventListener("keydown", keyHandler);
   };
-  updateSettings(jumpVKCode, crouchVKCode)
   document.addEventListener("keydown", keyHandler);
 });
 
@@ -148,13 +181,31 @@ document.getElementById("crouchButton").addEventListener("click", () => {
 
     crouchVKCode = vkCode >>> 0; // Ensure it's stored as uint32
 
+    updateSettings(jumpVKCode, crouchVKCode);
+
     document.removeEventListener("keydown", keyHandler);
   };
-  updateSettings(jumpVKCode, crouchVKCode)
   document.addEventListener("keydown", keyHandler);
 });
 
 function updateSettings(jump, crouch) {
+  if (jump == null || crouch == null) return;
+
+  LogPrint('Updating settings: ' + jump)
   const fps = parseInt(document.getElementById("fpsInput").value, 10);
   UpdateSettings(fps, jump, crouch).then(result =>{});
 } 
+
+function getSettings() {
+  GetSettings().then(settings => {
+    if (!settings) return;
+    LogPrint("got settings" + settings.jumpKey);
+    
+    jumpVKCode = settings.jumpKey;
+    crouchVKCode = settings.crouchKey;
+
+    document.getElementById("jumpButton").innerHTML =`${vkMap[jumpVKCode] || "?"}&nbsp;&nbsp;<span class="icon"><i class="fas fa-keyboard"></i></span>`;
+    document.getElementById("crouchButton").innerHTML = `${vkMap[crouchVKCode] || "?"}&nbsp;&nbsp;<span class="icon"><i class="fas fa-keyboard"></i></span>`;
+    document.getElementById("fpsInput").value = settings.fps;
+  });
+}
