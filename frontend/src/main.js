@@ -41,14 +41,15 @@ document.querySelector('#app').innerHTML = `
   </div>
 
   <div id="page-home" class="page">
-    <div class="container">
-      <div class="timeline" id="timeline"></div>
-      <div class="result" id="result">Waiting for input...</div>
-    </div>
+    <div class="results-container" id="resultsContainer"></div>
   </div>
 
   <div id="page-settings" class="page hidden">
     <div class="column-container">
+    <div class="row">      
+      <p>FPS:</p>
+      <input id="fpsInput" class="input" type="number" min="1" />
+    </div>
     <div class="row">
       <p>Jump Key:</p>
       <button id="jumpButton" class="button setting-button is-link is-outlined">
@@ -59,55 +60,27 @@ document.querySelector('#app').innerHTML = `
       <p>Crouch Key:</p>
       <button id="crouchButton" class="button">C</button>
     </div>
-    <div class="row">      
-      <p>FPS:</p>
-      <input id="fpsInput" class="input" type="number" min="1" />
-    </div>
+
   </div>
 `;
 
-const averageElement = document.getElementById("averageDisplay");
-const resultElement = document.getElementById("result");
-const timeline = document.getElementById("timeline");
+const resultsContainer = document.getElementById("resultsContainer");
+resultsContainer.scrollTop = 0;
 
 // Nav click handlers
 document.getElementById("nav-home").onclick = () => updateActive(document.getElementById("nav-home"));
 document.getElementById("nav-settings").onclick = () => updateActive(document.getElementById("nav-settings"));
 
-for (let i = 0; i < 10; i++) {
-  const dot = document.createElement("div");
-  dot.classList.add("timeline-dot");
-  dot.style.backgroundColor = "#444"; // neutral gray
-  timeline.appendChild(dot);
-}
-
 EventsOn("superglideResult", (data) => {
-  // Update result display
-  resultElement.innerHTML = `
-    Attempt #${data.attempt}<br>
-    ${data.chancePercent.toFixed(1)}% chance<br>
-    ${data.framesElapsed.toFixed(2)} frames<br>
-    ${data.message}
-  `;
-
-  // Color Updates
   const color = getColorFromChance(data.chancePercent);
-  resultElement.style.color = color;
-  averageElement.style.color = color;
-
-  // Time line 
-  const dot = document.createElement("div");
-  dot.classList.add("timeline-dot");
-  dot.style.backgroundColor = color;
-
-  timeline.appendChild(dot);
-
-  if (timeline.children.length > 10) {
-    timeline.removeChild(timeline.firstChild);
-  }  
-
-  // Update average display
-  averageElement.innerHTML = `Average: ${data.averageChance.toFixed(1)}%`;
+  const box = document.createElement("div");
+  box.classList.add("result-box");
+  box.style.backgroundColor = color;
+  box.innerHTML = `
+    <div class="result-chance">${data.chancePercent.toFixed(1)}%</div>
+    <div class="result-message">${data.message}</div>
+  `;
+  resultsContainer.prepend(box);
 });
 
 // Style active tab underline
@@ -127,11 +100,11 @@ function updateActive(tab) {
 }
 
 function getColorFromChance(chance) {
-  if (chance >= 95) return "#00ff00";
-  if(chance >= 70) return "#44ffa4"
-  if (chance >= 50) return "#44ffa4";
-  if(chance >= 30) return "fff000"
-  return "#ff4444";
+  if (chance >= 95) return "rgba(0, 255, 0, 0.25)";         // green
+  if (chance >= 70) return "rgba(68, 255, 164, 0.25)";       // teal-green
+  if (chance >= 50) return "rgba(68, 255, 164, 0.25)";
+  if (chance >= 30) return "rgba(255, 240, 0, 0.25)";        // yellow
+  return "rgba(255, 68, 68, 0.25)";                          // red
 }
 
 let jumpVKCode = null;
