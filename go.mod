@@ -3,6 +3,7 @@ module superglide-overlay
 go 1.23
 
 require (
+	github.com/lxn/win v0.0.0-20210218163916-a377121e959e
 	github.com/moutend/go-hook v0.1.0
 	github.com/wailsapp/wails/v2 v2.10.1
 )
