@@ -1,8 +1,9 @@
-name: Wails Build
+name: Build and Release Wails App
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
   build:
@@ -12,27 +13,48 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Wails Build
-        uses: The-Egg-Corp/wails-build-action@v1.4
+      - name: Setup Go
+        uses: actions/setup-go@v4
         with:
-          build: true
-          build-platform: windows/amd64, windows/386
-          wails-version: v2.10.1
-          go-version: 1.21
-          node-version: 18
-          
-      - name: Zip Source Code
-        run: |
-          git archive -o source.zip HEAD
+          go-version: '1.21'
 
-      - name: Upload to GitHub Release
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install Wails CLI
+        run: go install github.com/wailsapp/wails/v2/cmd/wails@v2.10.1
+
+      - name: Add Go bin to PATH
+        run: echo "$env:USERPROFILE\\go\\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+      - name: Install frontend dependencies
+        run: npm install
+        working-directory: frontend
+
+      - name: Build Wails App for Windows amd64 and 386
+        run: wails build -platform windows/amd64,windows/386
+
+      - name: List output files for debug
+        run: dir build\bin
+
+      - name: Rename executables
+        run: |
+          rename-item build\bin\superglide-overlay_windows_amd64.exe superglide-win64.exe
+          rename-item build\bin\superglide-overlay_windows_386.exe superglide-win32.exe
+
+      - name: Zip source code
+        run: git archive -o source.zip HEAD
+
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: v1.${{ github.run_number }}
           name: Release v1.${{ github.run_number }}
           files: |
-            build/bin/superglide-overlay.exe
-            build/bin/superglide-overlay.exe
+            superglide-win64.exe
+            superglide-win32.exe
             source.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
