@@ -1,0 +1,61 @@
+name: Build Wails App
+
+on:
+  push:
+    branches: [ main ]
+    paths-ignore:
+      - '**.md'
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install Wails CLI
+        run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
+
+      - name: Add Go bin to PATH
+        run: echo "${{ runner.workspace }}\\go\\bin" >> $GITHUB_PATH
+
+      - name: Install frontend dependencies
+        run: npm install
+        working-directory: ./frontend
+
+      - name: Build Wails app
+        run: wails build -platform windows/amd64
+
+      - name: Zip Source Code
+        run: |
+          powershell Compress-Archive -Path * -DestinationPath source.zip
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifacts
+          path: |
+            build/bin/*.exe
+            source.zip
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ github.run_number }}
+          name: Release v${{ github.run_number }}
+          files: |
+            build/bin/*.exe
+            source.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
