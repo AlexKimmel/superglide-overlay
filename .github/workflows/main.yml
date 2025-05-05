@@ -48,8 +48,8 @@ jobs:
           tag_name: v1.${{ github.run_number }}
           name: Release v1.${{ github.run_number }}
           files: |
-            superglide-win64.exe
-            superglide-win32.exe
+            build\bin\superglide-win64.exe
+            build\bin\superglide-win32.exe
             source.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
