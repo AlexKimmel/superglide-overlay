@@ -20,25 +20,25 @@ jobs:
           wails-version: v2.10.1
           go-version: 1.21
           node-version: 18
+          
+      - name: Confirm Executable Output
+        run: |
+          dir build\bin
+          if (!(Test-Path "build\bin\superglide-overlay.exe")) {
+            throw "Executable not found!"
+          }
 
       - name: Zip Source Code
-        run: Compress-Archive -Path * -DestinationPath source.zip
+        run: |
+          git archive -o source.zip HEAD
 
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-output
-          path: |
-            build/bin/*.exe
-            source.zip
-
-      - name: Create GitHub Release
+      - name: Upload to GitHub Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: v${{ github.run_number }}
           name: Release v${{ github.run_number }}
           files: |
-            build/bin/*.exe
+            build/bin/superglide-overlay.exe
             source.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
