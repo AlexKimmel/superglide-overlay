@@ -1,50 +1,31 @@
-name: Build Wails App
+name: Wails Build
 
 on:
   push:
-    branches: [ main ]
-    paths-ignore:
-      - '**.md'
+    branches: [main]
 
 jobs:
-  build-windows:
+  build:
     runs-on: windows-latest
 
     steps:
-      - name: Checkout repo
-        uses: actions/upload-artifact@v3.1.2
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - name: Setup Go
-        uses: actions/setup-go@v4
+      - name: Wails Build
+        uses: wailsapp/github-action@v2
         with:
-          go-version: '1.21'
+          platform: windows/amd64
+          skipFrontend: false
+          skipBuild: false
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-
-      - name: Install Wails CLI
-        run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
-
-      - name: Add Go bin to PATH
-        run: echo "${{ runner.workspace }}\\go\\bin" >> $GITHUB_PATH
-
-      - name: Install frontend dependencies
-        run: npm install
-        working-directory: ./frontend
-
-      - name: Build Wails app
-        run: wails build -platform windows/amd64
-
-      - name: Zip Source Code
-        run: |
-          powershell Compress-Archive -Path * -DestinationPath source.zip
+      - name: Zip source code
+        run: Compress-Archive -Path * -DestinationPath source.zip
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: build-artifacts
+          name: build-output
           path: |
             build/bin/*.exe
             source.zip
