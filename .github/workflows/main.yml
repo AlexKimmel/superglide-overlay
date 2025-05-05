@@ -48,8 +48,8 @@ jobs:
           tag_name: v1.${{ github.run_number }}
           name: Release v1.${{ github.run_number }}
           files: |
-            superglide-overlay-amd64.exe
-            superglide-overlay-386.exe
+            build/bin/superglide-overlay-amd64.exe
+            build/bin/superglide-overlay-386.exe
             source.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
