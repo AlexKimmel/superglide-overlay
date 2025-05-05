@@ -15,11 +15,13 @@ jobs:
       - name: Wails Build
         uses: The-Egg-Corp/wails-build-action@v1.4
         with:
-          platform: windows/amd64
-          skipFrontend: false
-          skipBuild: false
+          build: true
+          build-platform: windows/amd64
+          wails-version: v2.10.1
+          go-version: 1.21
+          node-version: 18
 
-      - name: Zip source code
+      - name: Zip Source Code
         run: Compress-Archive -Path * -DestinationPath source.zip
 
       - name: Upload artifacts
