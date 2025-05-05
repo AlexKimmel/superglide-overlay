@@ -2,9 +2,7 @@ package main
 
 import (
 	"context"
-	"syscall"
 
-	"github.com/lxn/win"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
@@ -24,8 +22,8 @@ func NewApp() *App {
 // startup is called when the app starts. The context is saved
 // so we can call the runtime methods
 func (a *App) startup(ctx context.Context) {
-	hwnd := win.FindWindow(nil, syscall.StringToUTF16Ptr("Superglide Overlay"))
-	win.SetWindowLong(hwnd, win.GWL_EXSTYLE, win.GetWindowLong(hwnd, win.GWL_EXSTYLE)|win.WS_EX_LAYERED)
+	// hwnd := win.FindWindow(nil, syscall.StringToUTF16Ptr("Superglide Overlay"))
+	// win.SetWindowLong(hwnd, win.GWL_EXSTYLE, win.GetWindowLong(hwnd, win.GWL_EXSTYLE)|win.WS_EX_LAYERED)
 
 	fps, jump, crouch, err := getSave()
 

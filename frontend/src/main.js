@@ -100,15 +100,16 @@ function updateActive(tab) {
 }
 
 function getColorFromChance(chance) {
-  if (chance >= 95) return "rgba(0, 255, 0, 0.25)";         // green
-  if (chance >= 70) return "rgba(68, 255, 164, 0.25)";       // teal-green
+  if (chance >= 95) return "rgba(0, 255, 0, 0.25)";         
+  if (chance >= 70) return "rgba(68, 255, 164, 0.25)";       
   if (chance >= 50) return "rgba(68, 255, 164, 0.25)";
-  if (chance >= 30) return "rgba(255, 240, 0, 0.25)";        // yellow
-  return "rgba(255, 68, 68, 0.25)";                          // red
+  if (chance >= 30) return "rgba(255, 240, 0, 0.25)";       
+  return "rgba(255, 68, 68, 0.25)";                          
 }
 
 let jumpVKCode = null;
 let crouchVKCode = null;
+let fps = null;
 
 document.getElementById("jumpButton").addEventListener("click", () => {
   const button = document.getElementById("jumpButton");
@@ -128,7 +129,7 @@ document.getElementById("jumpButton").addEventListener("click", () => {
     }
     jumpVKCode = vkCode >>> 0; // Ensure it's stored as uint32
 
-    updateSettings(jumpVKCode, crouchVKCode);
+    updateSettings(fps, jumpVKCode, crouchVKCode);
 
     document.removeEventListener("keydown", keyHandler);
   };
@@ -154,25 +155,25 @@ document.getElementById("crouchButton").addEventListener("click", () => {
 
     crouchVKCode = vkCode >>> 0; // Ensure it's stored as uint32
 
-    updateSettings(jumpVKCode, crouchVKCode);
+    updateSettings(fps, jumpVKCode, crouchVKCode);
 
     document.removeEventListener("keydown", keyHandler);
   };
   document.addEventListener("keydown", keyHandler);
 });
+document.getElementById("fpsInput").addEventListener("change", (event) => {
+  fps = parseInt(event.target.value, 10);
+  updateSettings(fps, jumpVKCode, crouchVKCode);
+});
 
-function updateSettings(jump, crouch) {
-  if (jump == null || crouch == null) return;
-
-  LogPrint('Updating settings: ' + jump)
-  const fps = parseInt(document.getElementById("fpsInput").value, 10);
+function updateSettings(fps, jump, crouch) {
+  if (fps == null || jump == null || crouch == null) return;
   UpdateSettings(fps, jump, crouch).then(result =>{});
 } 
 
 function getSettings() {
   GetSettings().then(settings => {
     if (!settings) return;
-    LogPrint("got settings" + settings.jumpKey);
     
     jumpVKCode = settings.jumpKey;
     crouchVKCode = settings.crouchKey;
