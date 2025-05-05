@@ -2,7 +2,9 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
+	"path/filepath"
 )
 
 type Settings struct {
@@ -17,15 +19,41 @@ func saveData(fps float64, jump uint32, crouch uint32) error {
 	if err != nil {
 		return err
 	}
-	return os.WriteFile("config.json", data, 0644)
+
+	path, err := getConfigPath()
+
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(path, data, 0644)
 }
 
 func getSave() (float64, uint32, uint32, error) {
-	data, err := os.ReadFile("config.json")
+
+	path, err := getConfigPath()
+
+	if err != nil {
+		return 0, 0, 0, err
+	}
+
+	data, err := os.ReadFile(path)
 	if err != nil {
 		return 0, 0, 0, err
 	}
 	var s Settings
 	err = json.Unmarshal(data, &s)
 	return s.FPS, s.Jump, s.Crouch, err
+}
+
+func getConfigPath() (string, error) {
+	appData := os.Getenv("APPDATA") // resolves to something like C:\Users\Username\AppData\Roaming
+	if appData == "" {
+		return "", fmt.Errorf("APPDATA environment variable not found")
+	}
+	configDir := filepath.Join(appData, "SuperglideOverlay")
+	err := os.MkdirAll(configDir, 0755) // ensure directory exists
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(configDir, "config.data"), nil
 }
