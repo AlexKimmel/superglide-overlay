@@ -39,11 +39,6 @@ jobs:
       - name: List output files for debug
         run: dir build\bin
 
-      - name: Rename executables
-        run: |
-          rename-item build\bin\superglide-overlay-amd64.exe superglide-win64.exe
-          rename-item build\bin\superglide-overlay.exe superglide-win32.exe
-
       - name: Zip source code
         run: git archive -o source.zip HEAD
 
