@@ -116,20 +116,8 @@ document.getElementById("jumpButton").addEventListener("click", () => {
   button.textContent = "Press any key...";
 
   const keyHandler = (event) => {
-    // event.preventDefault();
     
-    // const vkCode = event.keyCode || event.which; // This is the VKCode
-    // const keyLabel = event.key.toUpperCase();
-    
-    // if(keyLabel == " ") {
-    //   button.innerHTML = `SPACE&nbsp;&nbsp;<span class="icon"><i class="fas fa-keyboard"></i></span>`;
-    // }
-    // else {
-    //   button.innerHTML = `${keyLabel}&nbsp;&nbsp;<span class="icon"><i class="fas fa-keyboard"></i></span>`;
-    // }
-    // jumpVKCode = vkCode >>> 0; // Ensure it's stored as uint32
-
-    updateSettings("jump");
+    updateSettings("jump", fps);
 
     document.removeEventListener("keydown", keyHandler);
   };
@@ -141,21 +129,8 @@ document.getElementById("crouchButton").addEventListener("click", () => {
   button.textContent = "Press any key...";
 
   const keyHandler = (event) => {
-    event.preventDefault();
     
-    const vkCode = event.keyCode || event.which; // This is the VKCode
-    const keyLabel = event.key.toUpperCase();
-  
-    if(keyLabel == " ") {
-      button.innerHTML = `SPACE&nbsp;&nbsp;<span class="icon"><i class="fas fa-keyboard"></i></span>`;
-    }
-    else {
-      button.innerHTML = `${keyLabel}&nbsp;&nbsp;<span class="icon"><i class="fas fa-keyboard"></i></span>`;
-    }
-
-    crouchVKCode = vkCode >>> 0; // Ensure it's stored as uint32
-
-    updateSettings(fps, jumpVKCode, crouchVKCode);
+    updateSettings("crouch", fps);
 
     document.removeEventListener("keydown", keyHandler);
   };
@@ -163,7 +138,7 @@ document.getElementById("crouchButton").addEventListener("click", () => {
 });
 document.getElementById("fpsInput").addEventListener("change", (event) => {
   fps = parseInt(event.target.value, 10);
-  updateSettings(fps, jumpVKCode, crouchVKCode);
+  updateSettings("fps", fps);
 });
 
 function updateSettings(fps, jump, crouch) {
