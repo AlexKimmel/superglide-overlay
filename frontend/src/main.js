@@ -84,6 +84,14 @@ EventsOn("superglideResult", (data) => {
   resultsContainer.scrollTop = resultsContainer.scrollHeight;
 });
 
+EventsOn("updateInput", (data) => {
+  const jumpButton = document.getElementById("jumpButton");
+  const crouchButton = document.getElementById("crouchButton");
+
+  jumpButton.innerHTML = `${data.jump}&nbsp;&nbsp;<span class="icon"><i class="fas fa-keyboard"></i></span>`;
+  crouchButton.innerHTML = `${data.crouch}&nbsp;&nbsp;<span class="icon"><i class="fas fa-keyboard"></i></span>`;
+})
+
 // Style active tab underline
 function updateActive(tab) {
   document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active"));
@@ -116,27 +124,17 @@ document.getElementById("jumpButton").addEventListener("click", () => {
   const button = document.getElementById("jumpButton");
   button.textContent = "Press any key...";
 
-  const keyHandler = (event) => {
-    
-    updateSettings("jump", fps);
-
-    document.removeEventListener("keydown", keyHandler);
-  };
-  document.addEventListener("keydown", keyHandler);
+  updateSettings("jump", fps);
 });
 
 document.getElementById("crouchButton").addEventListener("click", () => {
   const button = document.getElementById("crouchButton");
   button.textContent = "Press any key...";
-
-  const keyHandler = (event) => {
-    
-    updateSettings("crouch", fps);
-
-    document.removeEventListener("keydown", keyHandler);
-  };
-  document.addEventListener("keydown", keyHandler);
+  
+  updateSettings("crouch", fps);
+  
 });
+
 document.getElementById("fpsInput").addEventListener("change", (event) => {
   fps = parseInt(event.target.value, 10);
   updateSettings("fps", fps);

@@ -66,6 +66,8 @@ func (h *InputHandler) run() {
 				if err != nil {
 					runtime.LogPrintf(h.ctx, "Error in update Setting: %e", err)
 				}
+
+				runtime.EventsEmit(h.ctx, "updateInput", map[string]any{"jump": h.glide.KeyBinds.Jump, "crouch": h.glide.KeyBinds.Crouch})
 			}
 			if h.glide.KeyBinds.UpdateCrouch {
 				h.glide.KeyBinds.Crouch = uint32(k.VKCode)
@@ -75,6 +77,8 @@ func (h *InputHandler) run() {
 				if err != nil {
 					runtime.LogPrintf(h.ctx, "Error in update Setting: %e", err)
 				}
+
+				runtime.EventsEmit(h.ctx, "updateInput", map[string]any{"jump": h.glide.KeyBinds.Jump, "crouch": h.glide.KeyBinds.Crouch})
 			}
 
 			switch uint32(k.VKCode) {
