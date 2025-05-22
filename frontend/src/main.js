@@ -116,20 +116,20 @@ document.getElementById("jumpButton").addEventListener("click", () => {
   button.textContent = "Press any key...";
 
   const keyHandler = (event) => {
-    event.preventDefault();
+    // event.preventDefault();
     
-    const vkCode = event.keyCode || event.which; // This is the VKCode
-    const keyLabel = event.key.toUpperCase();
+    // const vkCode = event.keyCode || event.which; // This is the VKCode
+    // const keyLabel = event.key.toUpperCase();
     
-    if(keyLabel == " ") {
-      button.innerHTML = `SPACE&nbsp;&nbsp;<span class="icon"><i class="fas fa-keyboard"></i></span>`;
-    }
-    else {
-      button.innerHTML = `${keyLabel}&nbsp;&nbsp;<span class="icon"><i class="fas fa-keyboard"></i></span>`;
-    }
-    jumpVKCode = vkCode >>> 0; // Ensure it's stored as uint32
+    // if(keyLabel == " ") {
+    //   button.innerHTML = `SPACE&nbsp;&nbsp;<span class="icon"><i class="fas fa-keyboard"></i></span>`;
+    // }
+    // else {
+    //   button.innerHTML = `${keyLabel}&nbsp;&nbsp;<span class="icon"><i class="fas fa-keyboard"></i></span>`;
+    // }
+    // jumpVKCode = vkCode >>> 0; // Ensure it's stored as uint32
 
-    updateSettings(fps, jumpVKCode, crouchVKCode);
+    updateSettings("jump");
 
     document.removeEventListener("keydown", keyHandler);
   };

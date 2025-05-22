@@ -3,4 +3,4 @@
 
 export function GetSettings():Promise<Record<string, any>>;
 
-export function UpdateSettings(arg1:number,arg2:number,arg3:number):Promise<void>;
+export function UpdateSettings(arg1:string,arg2:number):Promise<void>;

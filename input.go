@@ -58,6 +58,25 @@ func (h *InputHandler) run() {
 				continue //  only handel key down
 			}
 
+			if h.glide.KeyBinds.UpdateJump {
+				h.glide.KeyBinds.Jump = uint32(k.VKCode)
+				h.glide.KeyBinds.UpdateJump = false
+				err := saveData(h.glide.TargetFPS, h.glide.KeyBinds.Jump, h.glide.KeyBinds.Crouch)
+
+				if err != nil {
+					runtime.LogPrintf(h.ctx, "Error in update Setting: %e", err)
+				}
+			}
+			if h.glide.KeyBinds.UpdateCrouch {
+				h.glide.KeyBinds.Crouch = uint32(k.VKCode)
+				h.glide.KeyBinds.UpdateCrouch = false
+				err := saveData(h.glide.TargetFPS, h.glide.KeyBinds.Jump, h.glide.KeyBinds.Crouch)
+
+				if err != nil {
+					runtime.LogPrintf(h.ctx, "Error in update Setting: %e", err)
+				}
+			}
+
 			switch uint32(k.VKCode) {
 			case uint32(h.glide.KeyBinds.Jump):
 				h.glide.RegisterJump()

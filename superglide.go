@@ -15,8 +15,10 @@ const (
 )
 
 type KeyBinds struct {
-	Jump   uint32
-	Crouch uint32
+	Jump         uint32
+	Crouch       uint32
+	UpdateJump   bool
+	UpdateCrouch bool
 }
 
 type SuperglideChecker struct {
