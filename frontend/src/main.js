@@ -80,7 +80,8 @@ EventsOn("superglideResult", (data) => {
     <div class="result-chance">${data.chancePercent.toFixed(1)}%</div>
     <div class="result-message">${data.message}</div>
   `;
-  resultsContainer.prepend(box);
+  resultsContainer.prepend(box); 
+  resultsContainer.scrollTop = resultsContainer.scrollHeight;
 });
 
 // Style active tab underline

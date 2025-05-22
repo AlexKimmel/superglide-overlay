@@ -4,6 +4,7 @@ import (
 	"context"
 	"syscall"
 
+	"github.com/lxn/win"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
