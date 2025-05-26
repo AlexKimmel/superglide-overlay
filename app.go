@@ -43,7 +43,7 @@ func (a *App) startup(ctx context.Context) {
 }
 
 func (a *App) UpdateSettings(s string, fps float64) {
-
+	runtime.LogPrint(a.ctx, s)
 	switch s {
 	case "jump":
 		a.inputHandler.glide.KeyBinds.UpdateJump = true

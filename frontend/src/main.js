@@ -85,11 +85,12 @@ EventsOn("superglideResult", (data) => {
 });
 
 EventsOn("updateInput", (data) => {
+  isUpdating = false; 
   const jumpButton = document.getElementById("jumpButton");
   const crouchButton = document.getElementById("crouchButton");
 
-  jumpButton.innerHTML = `${data.jump}&nbsp;&nbsp;<span class="icon"><i class="fas fa-keyboard"></i></span>`;
-  crouchButton.innerHTML = `${data.crouch}&nbsp;&nbsp;<span class="icon"><i class="fas fa-keyboard"></i></span>`;
+  jumpButton.innerHTML = `${vkMap[data.jump]}&nbsp;&nbsp;<span class="icon"><i class="fas fa-keyboard"></i></span>`;
+  crouchButton.innerHTML = `${vkMap[data.crouch]}&nbsp;&nbsp;<span class="icon"><i class="fas fa-keyboard"></i></span>`;
 })
 
 // Style active tab underline
@@ -119,18 +120,25 @@ function getColorFromChance(chance) {
 let jumpVKCode = null;
 let crouchVKCode = null;
 let fps = null;
+let isUpdating = false;
 
 document.getElementById("jumpButton").addEventListener("click", () => {
+  if (isUpdating) return;
+  isUpdating = true;
+
   const button = document.getElementById("jumpButton");
   button.textContent = "Press any key...";
-
+  button.blur();
   updateSettings("jump", fps);
 });
 
 document.getElementById("crouchButton").addEventListener("click", () => {
+  if (isUpdating) return;
+  isUpdating = true;
+
   const button = document.getElementById("crouchButton");
   button.textContent = "Press any key...";
-  
+  button.blur();
   updateSettings("crouch", fps);
   
 });
@@ -140,9 +148,8 @@ document.getElementById("fpsInput").addEventListener("change", (event) => {
   updateSettings("fps", fps);
 });
 
-function updateSettings(fps, jump, crouch) {
-  if (fps == null || jump == null || crouch == null) return;
-  UpdateSettings(fps, jump, crouch).then(result =>{});
+function updateSettings(s, fps) {
+  UpdateSettings(s, fps).then(result =>{});
 } 
 
 function getSettings() {
