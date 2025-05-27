@@ -3,7 +3,7 @@ name: Build and Release Wails App
 on:
   push:
     branches:
-      - main
+      - release
 
 jobs:
   build:
