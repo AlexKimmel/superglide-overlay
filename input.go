@@ -8,9 +8,14 @@ import (
 	"time"
 
 	"github.com/moutend/go-hook/pkg/keyboard"
+
+	"github.com/moutend/go-hook/pkg/mouse"
 	"github.com/moutend/go-hook/pkg/types"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
+
+const MOUSEWHEEL_UP = 7864320
+const MOUSEWHEEL_DOWN = 4287102976
 
 type InputHandler struct {
 	ctx   context.Context
@@ -30,14 +35,22 @@ func (h *InputHandler) StartListening(ctx context.Context) {
 }
 
 func (h *InputHandler) run() {
-	keyboardChan := make(chan types.KeyboardEvent, 100)
+	evKeyboardChan := make(chan types.KeyboardEvent, 10)
+	mouseChan := make(chan types.MouseEvent, 10)
 
-	if err := keyboard.Install(nil, keyboardChan); err != nil {
+	if err := keyboard.Install(nil, evKeyboardChan); err != nil {
 		runtime.LogError(h.ctx, fmt.Sprintf("Keyboard hook install error: %v", err))
 		return
 	}
 
 	defer keyboard.Uninstall()
+
+	if err := mouse.Install(nil, mouseChan); err != nil {
+		runtime.LogError(h.ctx, fmt.Sprintf("Mouse hook install error: %v", err))
+		return
+	}
+
+	defer mouse.Uninstall()
 
 	runtime.LogInfo(h.ctx, "Started capturing keyboard input")
 
@@ -47,50 +60,72 @@ func (h *InputHandler) run() {
 	for {
 		select {
 		case <-time.After(5 * time.Minute):
-			//runtime.LogInfo(h.ctx, "Keyboard hook timed out")
 			return
 		case <-signalChan:
-			//runtime.LogInfo(h.ctx, "Keyboard hook received shutdown signal")
 			return
-		case k := <-keyboardChan:
+		case m := <-mouseChan:
+			if m.Message != types.Message(522) {
+				continue // only handle scroll wheel input
+			}
 
+			if h.glide.KeyBinds.UpdateCrouch || h.glide.KeyBinds.UpdateJump {
+				h.UpdateBinds(uint32(m.MouseData))
+			}
+
+			switch m.MouseData {
+			case h.glide.KeyBinds.Jump:
+				h.glide.RegisterJump()
+				continue
+			case h.glide.KeyBinds.Crouch:
+				if result, ok := h.glide.RegisterCrouch(); ok {
+					runtime.EventsEmit(h.ctx, "superglideResult", result)
+				}
+			}
+
+		case k := <-evKeyboardChan:
 			if k.Message != types.WM_KEYDOWN {
 				continue //  only handel key down
 			}
 
-			if h.glide.KeyBinds.UpdateJump {
-				h.glide.KeyBinds.Jump = uint32(k.VKCode)
-				h.glide.KeyBinds.UpdateJump = false
-				err := saveData(h.glide.TargetFPS, h.glide.KeyBinds.Jump, h.glide.KeyBinds.Crouch)
-
-				if err != nil {
-					runtime.LogPrintf(h.ctx, "Error in update Setting: %e", err)
-				}
-
-				runtime.EventsEmit(h.ctx, "updateInput", map[string]any{"jump": h.glide.KeyBinds.Jump, "crouch": h.glide.KeyBinds.Crouch})
-			}
-			if h.glide.KeyBinds.UpdateCrouch {
-				h.glide.KeyBinds.Crouch = uint32(k.VKCode)
-				h.glide.KeyBinds.UpdateCrouch = false
-				err := saveData(h.glide.TargetFPS, h.glide.KeyBinds.Jump, h.glide.KeyBinds.Crouch)
-
-				if err != nil {
-					runtime.LogPrintf(h.ctx, "Error in update Setting: %e", err)
-				}
-
-				runtime.EventsEmit(h.ctx, "updateInput", map[string]any{"jump": h.glide.KeyBinds.Jump, "crouch": h.glide.KeyBinds.Crouch})
+			if h.glide.KeyBinds.UpdateCrouch || h.glide.KeyBinds.UpdateJump {
+				h.UpdateBinds(uint32(k.VKCode))
 			}
 
 			switch uint32(k.VKCode) {
 			case uint32(h.glide.KeyBinds.Jump):
 				h.glide.RegisterJump()
-
+				continue
 			case uint32(h.glide.KeyBinds.Crouch):
 				if result, ok := h.glide.RegisterCrouch(); ok {
-					//runtime.LogPrint(h.ctx, "Registerd Crouch input")
 					runtime.EventsEmit(h.ctx, "superglideResult", result)
 				}
 			}
 		}
+	}
+}
+
+func (h *InputHandler) UpdateBinds(newBind uint32) {
+
+	if h.glide.KeyBinds.UpdateJump {
+		h.glide.KeyBinds.Jump = newBind
+		h.glide.KeyBinds.UpdateJump = false
+		err := saveData(h.glide.TargetFPS, h.glide.KeyBinds.Jump, h.glide.KeyBinds.Crouch)
+
+		if err != nil {
+			runtime.LogPrintf(h.ctx, "Error in update Setting: %e", err)
+		}
+
+		runtime.EventsEmit(h.ctx, "updateInput", map[string]any{"jump": h.glide.KeyBinds.Jump, "crouch": h.glide.KeyBinds.Crouch})
+	}
+	if h.glide.KeyBinds.UpdateCrouch {
+		h.glide.KeyBinds.Crouch = newBind
+		h.glide.KeyBinds.UpdateCrouch = false
+		err := saveData(h.glide.TargetFPS, h.glide.KeyBinds.Jump, h.glide.KeyBinds.Crouch)
+
+		if err != nil {
+			runtime.LogPrintf(h.ctx, "Error in update Setting: %e", err)
+		}
+
+		runtime.EventsEmit(h.ctx, "updateInput", map[string]any{"jump": h.glide.KeyBinds.Jump, "crouch": h.glide.KeyBinds.Crouch})
 	}
 }
