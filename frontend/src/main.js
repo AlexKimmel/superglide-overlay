@@ -28,6 +28,8 @@ const vkMap = {
   40: "Down",
   45: "Insert",
   46: "Delete",
+  7864320: "Mousewheel DOWN",
+  4287102976: "Mousewheel UP",
   // 48–90 = 0-9, A-Z
 };
 
