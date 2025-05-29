@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
-	"time"
 
 	"github.com/moutend/go-hook/pkg/keyboard"
 
@@ -59,8 +58,6 @@ func (h *InputHandler) run() {
 
 	for {
 		select {
-		case <-time.After(5 * time.Minute):
-			return
 		case <-signalChan:
 			return
 		case m := <-mouseChan:
