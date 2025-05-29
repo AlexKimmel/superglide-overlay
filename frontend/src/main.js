@@ -12,6 +12,7 @@ const vkMap = {
   13: "Enter",
   16: "Shift",
   17: "Ctrl",
+  162: "Ctrl", // do not now why but this is for some people ctrl 
   18: "Alt",
   19: "Pause",
   20: "CapsLock",
