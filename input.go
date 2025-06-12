@@ -39,6 +39,15 @@ func (h *InputHandler) run() {
 
 	if err := keyboard.Install(nil, evKeyboardChan); err != nil {
 		runtime.LogError(h.ctx, fmt.Sprintf("Keyboard hook install error: %v", err))
+
+		messageOptions := runtime.MessageDialogOptions{
+			Type:    "Error",
+			Title:   "Keyboard Hook Error",
+			Message: err.Error(),
+			Buttons: []string{"Okay"},
+		}
+
+		runtime.MessageDialog(h.ctx, messageOptions)
 		return
 	}
 
@@ -46,6 +55,15 @@ func (h *InputHandler) run() {
 
 	if err := mouse.Install(nil, mouseChan); err != nil {
 		runtime.LogError(h.ctx, fmt.Sprintf("Mouse hook install error: %v", err))
+
+		messageOptions := runtime.MessageDialogOptions{
+			Type:    "Error",
+			Title:   "Mouse Hook Error",
+			Message: err.Error(),
+			Buttons: []string{"Okay"},
+		}
+
+		runtime.MessageDialog(h.ctx, messageOptions)
 		return
 	}
 
